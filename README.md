@@ -8,9 +8,8 @@
 
 ## Live demo
 
-🔗 **[View live demo →](https://YOUR-USERNAME.github.io/ot-canvas/)**
+🔗 **[View live demo →](https://calmony.github.io/ot-canvas/)**
 
-*(Replace `YOUR-USERNAME` with your GitHub handle after enabling Pages.)*
 
 ## What it does
 
