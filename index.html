@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OT Canvas — Unified Asset Management</title>
+<meta name="description" content="OT Unified Asset Management SaaS demo — Purdue Model, EOL, firmware, and vulnerability tracking for industrial control systems.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%99%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+:root {
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f5f4ef;
+  --color-background-tertiary: #faf9f5;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #5f5e5a;
+  --color-text-tertiary: #888780;
+  --color-border-tertiary: rgba(0,0,0,0.08);
+  --color-border-secondary: rgba(0,0,0,0.15);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background-primary: #1f1f1d;
+    --color-background-secondary: #2a2a28;
+    --color-background-tertiary: #161614;
+    --color-text-primary: #f0eee6;
+    --color-text-secondary: #b4b2a9;
+    --color-text-tertiary: #888780;
+    --color-border-tertiary: rgba(255,255,255,0.08);
+    --color-border-secondary: rgba(255,255,255,0.15);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { font-family: var(--font-sans); color: var(--color-text-primary); background: var(--color-background-tertiary); }
+.app { display: flex; height: 100vh; min-height: 700px; background: var(--color-background-tertiary); }
+.sidebar { width: 220px; min-width: 220px; background: var(--color-background-primary); border-right: 0.5px solid var(--color-border-tertiary); display: flex; flex-direction: column; }
+.sidebar-logo { padding: 18px 16px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.logo-text { font-size: 14px; font-weight: 500; letter-spacing: 0.04em; }
+.logo-sub { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+.nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+.nav-section { padding: 16px 16px 4px; font-size: 10px; font-weight: 500; color: var(--color-text-tertiary); letter-spacing: 0.08em; text-transform: uppercase; }
+.nav-item { display: flex; align-items: center; gap: 8px; padding: 7px 16px; font-size: 13px; color: var(--color-text-secondary); cursor: pointer; border: none; background: none; width: 100%; text-align: left; border-radius: 0; font-family: inherit; }
+.nav-item:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.nav-item.active { background: var(--color-background-secondary); color: var(--color-text-primary); font-weight: 500; border-left: 2px solid #378ADD; padding-left: 14px; }
+.nav-item i { font-size: 16px; }
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar { background: var(--color-background-primary); border-bottom: 0.5px solid var(--color-border-tertiary); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; }
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.page-title { font-size: 15px; font-weight: 500; }
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+.badge-info { background: #E6F1FB; color: #185FA5; }
+.badge-warn { background: #FAEEDA; color: #854F0B; }
+.badge-danger { background: #FCEBEB; color: #A32D2D; }
+.badge-success { background: #EAF3DE; color: #3B6D11; }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 13px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-primary); cursor: pointer; font-family: var(--font-sans); }
+.btn:hover { background: var(--color-background-secondary); }
+.btn-primary { background: #185FA5; color: #fff; border-color: #185FA5; }
+.btn-primary:hover { background: #0C447C; }
+.btn i { font-size: 15px; }
+.content { flex: 1; overflow-y: auto; padding: 16px 20px; }
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.metric-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+.metric-label { font-size: 11px; color: var(--color-text-tertiary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+.metric-val { font-size: 22px; font-weight: 500; }
+.metric-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 3px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+@media (max-width: 900px) { .two-col, .three-col { grid-template-columns: 1fr; } .sidebar { width: 60px; min-width: 60px; } .sidebar .logo-sub, .sidebar .nav-section, .nav-item span:not(.status-dot):not(.tag):not(.badge):not(.fw-badge):not(.level-badge):not(.level-name):not(.level-desc) { display: none; } .nav-item { justify-content: center; padding: 10px; } .nav-item.active { padding-left: 8px; } }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px 16px; }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.card-title { font-size: 13px; font-weight: 500; }
+.card-action { font-size: 12px; color: #185FA5; cursor: pointer; background: none; border: none; font-family: var(--font-sans); }
+.purdue-zone { border-radius: var(--border-radius-md); padding: 8px 10px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+.zone-label { font-size: 12px; font-weight: 500; }
+.zone-l4 { background: #E6F1FB; color: #0C447C; }
+.zone-l35 { background: #EAF3DE; color: #27500A; }
+.zone-l2 { background: #FAEEDA; color: #633806; }
+.zone-l1 { background: #FAECE7; color: #712B13; }
+.zone-l0 { background: #FCEBEB; color: #791F1F; }
+.asset-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.asset-table th { font-size: 11px; color: var(--color-text-tertiary); font-weight: 500; text-align: left; padding: 6px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); white-space: nowrap; }
+.asset-table td { padding: 7px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); vertical-align: middle; color: var(--color-text-primary); }
+.asset-table tr:last-child td { border-bottom: none; }
+.asset-table tr:hover td { background: var(--color-background-secondary); }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+.dot-online { background: #639922; }
+.dot-offline { background: #E24B4A; }
+.dot-warn { background: #EF9F27; }
+.purdue-visual { display: flex; flex-direction: column; gap: 4px; }
+.purdue-level { border-radius: var(--border-radius-md); padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+.purdue-level:hover { filter: brightness(0.96); }
+.level-info { display: flex; align-items: center; gap: 8px; }
+.level-num { font-size: 10px; font-weight: 500; opacity: 0.7; min-width: 18px; }
+.level-name { font-size: 12px; font-weight: 500; }
+.level-badge { font-size: 11px; font-weight: 500; padding: 1px 7px; border-radius: 10px; background: rgba(0,0,0,0.1); }
+.import-zone { border: 1.5px dashed var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 20px; text-align: center; color: var(--color-text-secondary); font-size: 13px; cursor: pointer; }
+.import-zone:hover { background: var(--color-background-secondary); }
+.import-zone i { font-size: 28px; display: block; margin-bottom: 6px; color: var(--color-text-tertiary); }
+.fw-badge { font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: 500; }
+.fw-ok { background: #EAF3DE; color: #3B6D11; }
+.fw-old { background: #FAEEDA; color: #854F0B; }
+.progress-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+.progress-label { min-width: 70px; color: var(--color-text-secondary); }
+.progress-track { flex: 1; height: 5px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 3px; }
+.progress-val { min-width: 28px; text-align: right; color: var(--color-text-secondary); font-size: 11px; }
+.tag { font-size: 10px; padding: 1px 6px; border-radius: 3px; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-tertiary); margin-right: 3px; display: inline-block; }
+.search-bar { display: flex; align-items: center; gap: 8px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 5px 10px; font-size: 13px; color: var(--color-text-secondary); margin-bottom: 10px; }
+.search-bar input { border: none; background: none; font-family: var(--font-sans); font-size: 13px; color: var(--color-text-primary); outline: none; flex: 1; }
+.alert-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 12px; }
+.alert-item:last-child { border-bottom: none; }
+.alert-icon { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ai-danger { background: #FCEBEB; color: #A32D2D; }
+.ai-warn { background: #FAEEDA; color: #854F0B; }
+.ai-info { background: #E6F1FB; color: #185FA5; }
+.chip-group { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.chip { font-size: 11px; padding: 2px 8px; border-radius: 12px; border: 0.5px solid var(--color-border-secondary); color: var(--color-text-secondary); background: transparent; cursor: pointer; font-family: var(--font-sans); }
+.chip.sel { background: #185FA5; color: #fff; border-color: #185FA5; }
+.demo-banner { background: #FAEEDA; color: #633806; font-size: 11px; padding: 4px 12px; text-align: center; border-bottom: 0.5px solid var(--color-border-tertiary); }
+</style>
+</head>
+<body>
+<div class="demo-banner">📊 Demo build — all data is synthetic. No real asset, network, or compliance information is represented here.</div>
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-text"><i class="ti ti-cpu" style="color:#378ADD"></i> OT CANVAS</div>
+      <div class="logo-sub">Unified Asset Management</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Overview</div>
+      <button class="nav-item active" onclick="showView('dashboard')"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+      <button class="nav-item" onclick="showView('alerts')"><i class="ti ti-bell-ringing"></i> Alerts <span style="margin-left:auto;font-size:10px;background:#FCEBEB;color:#A32D2D;padding:1px 6px;border-radius:10px;">9</span></button>
+      <div class="nav-section">Assets</div>
+      <button class="nav-item" onclick="showView('inventory')"><i class="ti ti-server"></i> Inventory</button>
+      <button class="nav-item" onclick="showView('purdue')"><i class="ti ti-stack"></i> Purdue Model</button>
+      <button class="nav-item" onclick="showView('network')"><i class="ti ti-network"></i> Network Map</button>
+      <div class="nav-section">Compliance</div>
+      <button class="nav-item" onclick="showView('firmware')"><i class="ti ti-cpu"></i> Firmware</button>
+      <button class="nav-item" onclick="showView('eol')"><i class="ti ti-calendar-x"></i> EOL Tracker</button>
+      <button class="nav-item" onclick="showView('vuln')"><i class="ti ti-shield-off"></i> Vulnerabilities</button>
+      <div class="nav-section">Operations</div>
+      <button class="nav-item" onclick="showView('import')"><i class="ti ti-upload"></i> Import / Scan</button>
+      <button class="nav-item" onclick="showView('reports')"><i class="ti ti-report"></i> Reports</button>
+      <button class="nav-item" onclick="showView('settings')"><i class="ti ti-settings"></i> Settings</button>
+    </nav>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="page-title" id="page-title">Dashboard</span>
+        <span class="badge badge-info" id="page-ctx">Site: PLANT-01</span>
+      </div>
+      <div class="topbar-right">
+        <button class="btn" onclick="showView('import')"><i class="ti ti-upload"></i> Import Scan</button>
+        <button class="btn btn-primary" onclick="showView('purdue')"><i class="ti ti-plus"></i> Add Asset</button>
+      </div>
+    </div>
+    <div class="content" id="main-content"></div>
+  </div>
+</div>
+
+<script>
+const ASSETS = [
+  { id:'A001', name:'PLC-CLX-REACTOR-01', type:'PLC', level:1, vendor:'Rockwell', model:'ControlLogix 1756-L83E', ip:'10.10.1.5', mac:'00:1D:9C:4A:1B:01', fw:'v32.011', fw_latest:'v34.014', status:'online', eol:'2029-03', cves:3, os:'Logix Firmware', zone:'Field (L1)', manual:true },
+  { id:'A002', name:'PLC-CLX-PACK-02', type:'PLC', level:1, vendor:'Rockwell', model:'ControlLogix 1756-L73', ip:'10.10.1.6', mac:'00:1D:9C:4A:1B:02', fw:'v28.013', fw_latest:'v32.016', status:'warn', eol:'2026-04', cves:5, os:'Logix Firmware', zone:'Field (L1)', manual:true },
+  { id:'A003', name:'PLC-CPX-UTIL-03', type:'PLC', level:1, vendor:'Rockwell', model:'CompactLogix 5380 5069-L320ER', ip:'10.10.1.7', mac:'00:1D:9C:4A:1B:03', fw:'v33.011', fw_latest:'v34.014', status:'online', eol:'2031-06', cves:1, os:'Logix Firmware', zone:'Field (L1)', manual:true },
+  { id:'A004', name:'PLC-CPX-CONV-04', type:'PLC', level:1, vendor:'Rockwell', model:'CompactLogix 5370 1769-L36ERM', ip:'10.10.1.8', mac:'00:1D:9C:4A:1B:04', fw:'v30.014', fw_latest:'v33.011', status:'online', eol:'2027-12', cves:2, os:'Logix Firmware', zone:'Field (L1)', manual:true },
+  { id:'A005', name:'PLC-S7-MIXER-01', type:'PLC', level:1, vendor:'Siemens', model:'SIMATIC S7-1500 CPU 1516-3 PN/DP', ip:'10.10.2.10', mac:'00:1B:1B:81:0A:01', fw:'V2.9.2', fw_latest:'V3.1.4', status:'online', eol:'2032-01', cves:1, os:'Siemens FW', zone:'Field (L1)', manual:true },
+  { id:'A006', name:'PLC-S7-DOSE-02', type:'PLC', level:1, vendor:'Siemens', model:'SIMATIC S7-1500 CPU 1513-1 PN', ip:'10.10.2.11', mac:'00:1B:1B:81:0A:02', fw:'V2.8.3', fw_latest:'V3.1.4', status:'warn', eol:'2032-01', cves:4, os:'Siemens FW', zone:'Field (L1)', manual:true },
+  { id:'A007', name:'PLC-S7-OVEN-03', type:'PLC', level:1, vendor:'Siemens', model:'SIMATIC S7-1200 CPU 1215C', ip:'10.10.2.12', mac:'00:1B:1B:81:0A:03', fw:'V4.4', fw_latest:'V4.5', status:'online', eol:'2030-06', cves:2, os:'Siemens FW', zone:'Field (L1)', manual:true },
+  { id:'A008', name:'PLC-S7-LEGACY-04', type:'PLC', level:1, vendor:'Siemens', model:'SIMATIC S7-400 CPU 414-3 PN/DP', ip:'10.10.2.13', mac:'00:1B:1B:81:0A:04', fw:'V7.0.3', fw_latest:'V7.0.3', status:'online', eol:'2025-10', cves:6, os:'Siemens FW', zone:'Field (L1)', manual:true },
+  { id:'A009', name:'OPC-KEP-SVR-01', type:'OPC Server', level:3, vendor:'Kepware (PTC)', model:'KEPServerEX v6.13', ip:'192.168.3.30', mac:'00:50:56:8A:3C:01', fw:'v6.13.263.0', fw_latest:'v6.16.339.0', status:'online', eol:'2027-09', cves:3, os:'Win Server 2019', zone:'Supervisory (L3)', manual:false },
+  { id:'A010', name:'OPC-KEP-SVR-02', type:'OPC Server', level:3, vendor:'Kepware (PTC)', model:'KEPServerEX v6.11', ip:'192.168.3.31', mac:'00:50:56:8A:3C:02', fw:'v6.11.728.0', fw_latest:'v6.16.339.0', status:'warn', eol:'2026-09', cves:5, os:'Win Server 2016', zone:'Supervisory (L3)', manual:false },
+  { id:'A011', name:'OPC-KEP-EDGE-03', type:'OPC Server', level:2, vendor:'Kepware (PTC)', model:'ThingWorx Kepware Edge', ip:'192.168.2.40', mac:'00:50:56:8A:3C:03', fw:'v1.7.0', fw_latest:'v1.9.0', status:'online', eol:'2028-06', cves:1, os:'Linux (Yocto)', zone:'Control (L2)', manual:false },
+  { id:'A012', name:'HMI-PVP-MAIN-01', type:'HMI', level:2, vendor:'Rockwell', model:'PanelView Plus 7 1500P 2715P-T15CD', ip:'192.168.2.20', mac:'00:1D:9C:5B:2C:01', fw:'v12.00.16', fw_latest:'v14.00.05', status:'online', eol:'2028-03', cves:2, os:'Win CE / WinCE 7', zone:'Control (L2)', manual:false },
+  { id:'A013', name:'HMI-PVP-LINE-02', type:'HMI', level:2, vendor:'Rockwell', model:'PanelView Plus 7 1000 2711P-T10C22D9P', ip:'192.168.2.21', mac:'00:1D:9C:5B:2C:02', fw:'v11.00.25', fw_latest:'v14.00.05', status:'warn', eol:'2026-09', cves:4, os:'Win CE', zone:'Control (L2)', manual:false },
+  { id:'A014', name:'HMI-FTV-SVR-01', type:'HMI', level:2, vendor:'Rockwell', model:'FactoryTalk View SE Server v12', ip:'192.168.2.22', mac:'00:1D:9C:5B:2C:03', fw:'v12.00.00', fw_latest:'v13.00.00', status:'online', eol:'2027-06', cves:3, os:'Win Server 2019', zone:'Control (L2)', manual:false },
+  { id:'A015', name:'HMI-FTV-CLIENT-01', type:'HMI', level:2, vendor:'Rockwell', model:'FactoryTalk View SE Client v12', ip:'192.168.2.23', mac:'00:1D:9C:5B:2C:04', fw:'v12.00.00', fw_latest:'v13.00.00', status:'online', eol:'2027-06', cves:1, os:'Win 10 LTSC', zone:'Control (L2)', manual:false },
+  { id:'A016', name:'SW-HM-RSP-CORE-01', type:'Switch', level:2, vendor:'Hirschmann', model:'RSP35 Industrial Backbone', ip:'192.168.2.1', mac:'EC:74:BA:01:01:01', fw:'HiOS 09.1.00', fw_latest:'HiOS 09.4.02', status:'online', eol:'2030-12', cves:2, os:'HiOS', zone:'Control (L2)', manual:false },
+  { id:'A017', name:'SW-HM-RSP-DIST-02', type:'Switch', level:2, vendor:'Hirschmann', model:'RSP25 Industrial Backbone', ip:'192.168.2.2', mac:'EC:74:BA:01:01:02', fw:'HiOS 08.7.00', fw_latest:'HiOS 09.4.02', status:'online', eol:'2029-06', cves:3, os:'HiOS', zone:'Control (L2)', manual:false },
+  { id:'A018', name:'SW-HM-RS30-ACC-03', type:'Switch', level:2, vendor:'Hirschmann', model:'RS30-0802 Managed Industrial', ip:'192.168.2.3', mac:'EC:74:BA:01:01:03', fw:'HiOS 06.0.01', fw_latest:'HiOS 06.0.06', status:'warn', eol:'2026-06', cves:4, os:'Classic HiOS', zone:'Control (L2)', manual:false },
+  { id:'A019', name:'SW-HM-MACH-RING-04', type:'Switch', level:2, vendor:'Hirschmann', model:'MACH1040 Modular Backbone', ip:'192.168.2.4', mac:'EC:74:BA:01:01:04', fw:'HiOS 09.0.04', fw_latest:'HiOS 09.4.02', status:'online', eol:'2031-03', cves:1, os:'HiOS', zone:'Control (L2)', manual:false },
+  { id:'A020', name:'FW-EAGLE40-DMZ-01', type:'Firewall', level:35, vendor:'Hirschmann (Belden)', model:'EAGLE40-03 Industrial Firewall', ip:'10.100.0.1', mac:'EC:74:BA:02:02:01', fw:'HiSecOS 03.4.00', fw_latest:'HiSecOS 04.1.02', status:'warn', eol:'2030-12', cves:3, os:'HiSecOS', zone:'DMZ (L3.5)', manual:false },
+  { id:'A021', name:'FW-EAGLE40-CELL-02', type:'Firewall', level:35, vendor:'Hirschmann (Belden)', model:'EAGLE40-03 Industrial Firewall', ip:'10.100.0.2', mac:'EC:74:BA:02:02:02', fw:'HiSecOS 04.0.01', fw_latest:'HiSecOS 04.1.02', status:'online', eol:'2030-12', cves:1, os:'HiSecOS', zone:'DMZ (L3.5)', manual:false },
+  { id:'A022', name:'FW-EAGLE40-NORTH-03', type:'Firewall', level:35, vendor:'Hirschmann (Belden)', model:'EAGLE40-7M Industrial Firewall', ip:'10.100.0.3', mac:'EC:74:BA:02:02:03', fw:'HiSecOS 04.1.02', fw_latest:'HiSecOS 04.1.02', status:'online', eol:'2031-06', cves:0, os:'HiSecOS', zone:'DMZ (L3.5)', manual:false },
+  { id:'A023', name:'SCADA-FTV-SE-01', type:'SCADA', level:3, vendor:'Rockwell', model:'FactoryTalk View SE Network 12', ip:'192.168.3.20', mac:'00:50:56:8A:3D:01', fw:'v12.00.00', fw_latest:'v13.00.00', status:'online', eol:'2027-06', cves:4, os:'Win Server 2019', zone:'Supervisory (L3)', manual:false },
+  { id:'A024', name:'HIST-FTH-01', type:'Historian', level:3, vendor:'Rockwell', model:'FactoryTalk Historian SE v8.1', ip:'192.168.3.21', mac:'00:50:56:8A:3D:02', fw:'v8.10.0', fw_latest:'v9.00.0', status:'warn', eol:'2026-12', cves:5, os:'Win Server 2019', zone:'Supervisory (L3)', manual:false },
+  { id:'A025', name:'EWS-STUDIO5K-01', type:'Workstation', level:2, vendor:'Rockwell', model:'Studio 5000 Logix Designer v33', ip:'192.168.2.55', mac:'00:50:56:8A:3D:03', fw:'v33.01.00', fw_latest:'v36.00.00', status:'online', eol:'2028-01', cves:2, os:'Win 10 LTSC', zone:'Control (L2)', manual:false },
+  { id:'A026', name:'EWS-TIA-01', type:'Workstation', level:2, vendor:'Siemens', model:'TIA Portal V17', ip:'192.168.2.56', mac:'00:50:56:8A:3D:04', fw:'V17 SP1', fw_latest:'V19', status:'online', eol:'2027-10', cves:3, os:'Win 10 LTSC', zone:'Control (L2)', manual:false },
+];
+
+const ALERTS = [
+  { sev:'danger', icon:'ti-shield-off', title:'PLC-S7-LEGACY-04 — 6 CVEs, EOL imminent', detail:'Siemens S7-400 CPU 414-3 PN/DP — EOL Oct 2025. Multiple CVEs in PROFINET stack.', time:'2h ago' },
+  { sev:'danger', icon:'ti-calendar-x', title:'PLC-CLX-PACK-02 — EOL in 11 months', detail:'ControlLogix 1756-L73 firmware v28 — 5 CVEs, vendor EOL April 2026.', time:'5h ago' },
+  { sev:'danger', icon:'ti-shield-off', title:'OPC-KEP-SVR-02 — 5 CVEs on Win Server 2016', detail:'KEPServerEX v6.11 on Server 2016. Multiple OPC UA vulnerabilities.', time:'1d ago' },
+  { sev:'danger', icon:'ti-cpu', title:'HIST-FTH-01 — FactoryTalk Historian behind', detail:'5 CVEs against v8.10. v9.00 patches available.', time:'1d ago' },
+  { sev:'warn', icon:'ti-cpu', title:'FW-EAGLE40-DMZ-01 — HiSecOS outdated', detail:'HiSecOS 03.4.00 → 04.1.02 available. 3 CVEs present in current build.', time:'2d ago' },
+  { sev:'warn', icon:'ti-cpu', title:'HMI-PVP-LINE-02 — PanelView firmware old', detail:'v11.00.25 → v14.00.05 available. WinCE base OS reaching EOL.', time:'3d ago' },
+  { sev:'warn', icon:'ti-cpu', title:'SW-HM-RS30-ACC-03 — Classic HiOS', detail:'RS30 on Classic HiOS 06.0.01. Hirschmann recommends RSPx replacement path.', time:'4d ago' },
+  { sev:'warn', icon:'ti-cpu', title:'PLC-S7-DOSE-02 — Siemens FW two minor versions back', detail:'V2.8.3 → V3.1.4 available. 4 CVEs in current firmware.', time:'5d ago' },
+  { sev:'info', icon:'ti-upload', title:'Nmap scan completed — 4 new assets', detail:'Discovered 4 unmanaged switches in cell network. Review pending.', time:'1d ago' },
+];
+
+function sendPrompt(t) { alert('Demo action: "' + t + '"\n\nIn the production version, this would generate a change request, POA&M entry, or migration plan via the AI backend.'); }
+
+function showView(v) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const map = { dashboard:0, alerts:1, inventory:2, purdue:3, network:4, firmware:5, eol:6, vuln:7, import:8, reports:9, settings:10 };
+  const items = document.querySelectorAll('.nav-item');
+  if (map[v] !== undefined && items[map[v]]) items[map[v]].classList.add('active');
+  const titles = { dashboard:'Dashboard', alerts:'Alerts', inventory:'Asset Inventory', purdue:'Purdue Model', network:'Network Map', firmware:'Firmware Manager', eol:'EOL Tracker', vuln:'Vulnerabilities', import:'Import / Scan', reports:'Reports', settings:'Settings' };
+  document.getElementById('page-title').textContent = titles[v] || v;
+  const ctx = { dashboard:'Site: PLANT-01', alerts:`${ALERTS.length} Active`, inventory:`${ASSETS.length} assets`, purdue:'Levels 0–4', firmware:`${ASSETS.length} devices`, eol:'Multiple expiring', vuln:`${ASSETS.reduce((s,a)=>s+a.cves,0)} CVEs`, import:'Nmap · CSV · XLSX', reports:'Auto-generated', settings:'Admin' };
+  document.getElementById('page-ctx').textContent = ctx[v] || '';
+  renderView(v);
+}
+
+function renderView(v) {
+  const el = document.getElementById('main-content');
+  if (v === 'dashboard') el.innerHTML = dashboardHTML();
+  else if (v === 'inventory') el.innerHTML = inventoryHTML();
+  else if (v === 'purdue') el.innerHTML = purdueHTML();
+  else if (v === 'firmware') el.innerHTML = firmwareHTML();
+  else if (v === 'eol') el.innerHTML = eolHTML();
+  else if (v === 'alerts') el.innerHTML = alertsHTML();
+  else if (v === 'import') el.innerHTML = importHTML();
+  else if (v === 'vuln') el.innerHTML = vulnHTML();
+  else el.innerHTML = `<div style="color:var(--color-text-secondary);font-size:13px;padding:20px;">View coming soon. This is a UI prototype — the ${v} view would render here in production.</div>`;
+}
+
+function eolColor(dateStr) {
+  const d = new Date(dateStr + '-01'), now = new Date(), months = (d - now) / (1000*60*60*24*30);
+  if (months < 6) return ['#E24B4A', 'danger'];
+  if (months < 18) return ['#EF9F27', 'warn'];
+  return ['#639922', 'ok'];
+}
+
+function dashboardHTML() {
+  const online = ASSETS.filter(a => a.status === 'online').length;
+  const warn = ASSETS.filter(a => a.status === 'warn').length;
+  const totalCVEs = ASSETS.reduce((s,a) => s + a.cves, 0);
+  const eolSoon = ASSETS.filter(a => eolColor(a.eol)[0] === '#E24B4A').length;
+  const manual = ASSETS.filter(a => a.manual).length;
+  const fwOld = ASSETS.filter(a => a.fw !== a.fw_latest && a.fw !== 'N/A').length;
+  const byLevel = [0,1,2,35,3,4].map(l => ({ l, count: ASSETS.filter(a => a.level === l).length }));
+  const levelNames = { 0:'Process (L0)', 1:'Field Devices (L1)', 2:'Control (L2)', 35:'DMZ (L3.5)', 3:'Supervisory (L3)', 4:'Enterprise (L4)' };
+  const levelColors = { 0:'zone-l0', 1:'zone-l1', 2:'zone-l2', 35:'zone-l35', 3:'zone-l35', 4:'zone-l4' };
+  const topCVE = [...ASSETS].sort((a,b) => b.cves - a.cves).slice(0,5);
+  const recentAlerts = ALERTS.slice(0,4);
+  return `
+<div class="metrics-grid">
+  <div class="metric-card"><div class="metric-label"><i class="ti ti-server" style="font-size:13px"></i> Total Assets</div><div class="metric-val">${ASSETS.length}</div><div class="metric-sub">${manual} manual · ${ASSETS.length - manual} imported</div></div>
+  <div class="metric-card"><div class="metric-label"><i class="ti ti-circle-check" style="font-size:13px"></i> Online</div><div class="metric-val" style="color:#639922">${online}</div><div class="metric-sub">${warn} degraded</div></div>
+  <div class="metric-card"><div class="metric-label"><i class="ti ti-shield-off" style="font-size:13px"></i> Open CVEs</div><div class="metric-val" style="color:#E24B4A">${totalCVEs}</div><div class="metric-sub">Across ${ASSETS.filter(a=>a.cves>0).length} assets</div></div>
+  <div class="metric-card"><div class="metric-label"><i class="ti ti-calendar-x" style="font-size:13px"></i> EOL Critical</div><div class="metric-val" style="color:#E24B4A">${eolSoon}</div><div class="metric-sub">Within 6 months</div></div>
+  <div class="metric-card"><div class="metric-label"><i class="ti ti-cpu" style="font-size:13px"></i> Firmware OOD</div><div class="metric-val" style="color:#EF9F27">${fwOld}</div><div class="metric-sub">Updates available</div></div>
+</div>
+<div class="two-col">
+  <div class="card">
+    <div class="card-header"><span class="card-title">Purdue Distribution</span><button class="card-action" onclick="showView('purdue')">View model →</button></div>
+    <div class="purdue-visual">${byLevel.map(({l,count}) => `<div class="purdue-level ${levelColors[l]}" onclick="showView('purdue')"><div class="level-info"><span class="level-num">L${l === 35 ? '3.5' : l}</span><span class="level-name">${levelNames[l]}</span></div><span class="level-badge">${count} assets</span></div>`).join('')}</div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Active Alerts</span><button class="card-action" onclick="showView('alerts')">All alerts →</button></div>
+    ${recentAlerts.map(a => `<div class="alert-item"><div class="alert-icon ai-${a.sev}"><i class="${a.icon}" style="font-size:13px"></i></div><div style="flex:1;min-width:0"><div style="font-weight:500;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.title}</div><div style="color:var(--color-text-secondary);font-size:11px;margin-top:1px">${a.detail.substring(0,60)}${a.detail.length>60?'…':''}</div></div><div style="font-size:10px;color:var(--color-text-tertiary);white-space:nowrap;margin-left:8px">${a.time}</div></div>`).join('')}
+  </div>
+</div>
+<div class="three-col">
+  <div class="card">
+    <div class="card-header"><span class="card-title">CVEs by Asset</span><button class="card-action" onclick="showView('vuln')">All vulns →</button></div>
+    ${topCVE.map(a => `<div class="progress-row"><span class="progress-label" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px;font-size:11px" title="${a.name}">${a.name.split('-').slice(0,3).join('-')}</span><div class="progress-track"><div class="progress-fill" style="width:${Math.min(100, a.cves*16)}%;background:${a.cves >= 4 ? '#E24B4A' : a.cves >= 2 ? '#EF9F27' : '#639922'}"></div></div><span class="progress-val">${a.cves}</span></div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">EOL Timeline</span><button class="card-action" onclick="showView('eol')">Track EOL →</button></div>
+    ${[...ASSETS].sort((a,b) => new Date(a.eol+'-01') - new Date(b.eol+'-01')).slice(0,5).map(a => { const [color] = eolColor(a.eol); return `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:11px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px;color:var(--color-text-primary)">${a.name}</span><span style="color:${color};font-weight:500;white-space:nowrap">${a.eol}</span></div>`;}).join('')}
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">Vendor Distribution</span></div>
+    ${(() => { const vendors = {}; ASSETS.forEach(a => { const key = a.vendor.split(' ')[0]; vendors[key] = (vendors[key] || 0) + 1; }); return Object.entries(vendors).sort((a,b) => b[1] - a[1]).map(([v, c]) => `<div class="progress-row"><span class="progress-label" style="font-size:11px">${v}</span><div class="progress-track"><div class="progress-fill" style="width:${c/ASSETS.length*100}%;background:#378ADD"></div></div><span class="progress-val">${c}</span></div>`).join(''); })()}
+  </div>
+</div>`;
+}
+
+function inventoryHTML() {
+  const cols = ['Status','Name','Type','Level','Vendor','Model','IP Address','MAC','Firmware','EOL','CVEs','Zone','Entry'];
+  return `<div class="search-bar"><i class="ti ti-search" style="font-size:15px"></i><input placeholder="Search assets, IP, MAC, vendor…" oninput="filterTable(this.value)" id="inv-search"></div><div class="card" style="overflow-x:auto"><table class="asset-table" id="inv-table"><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody id="inv-body">${ASSETS.map(assetRow).join('')}</tbody></table></div>`;
+}
+
+function assetRow(a) {
+  const dot = a.status === 'online' ? 'dot-online' : a.status === 'warn' ? 'dot-warn' : 'dot-offline';
+  const [ecolor] = eolColor(a.eol);
+  const fwMatch = a.fw === a.fw_latest || a.fw === 'N/A';
+  return `<tr><td><span class="status-dot ${dot}"></span>${a.status}</td><td style="font-weight:500;white-space:nowrap">${a.name}</td><td><span class="tag">${a.type}</span></td><td style="text-align:center">L${a.level === 35 ? '3.5' : a.level}</td><td>${a.vendor}</td><td style="font-size:11px;color:var(--color-text-secondary)">${a.model}</td><td style="font-family:var(--font-mono);font-size:11px">${a.ip}</td><td style="font-family:var(--font-mono);font-size:10px">${a.mac}</td><td><span class="fw-badge ${fwMatch ? 'fw-ok' : 'fw-old'}">${a.fw}</span></td><td style="color:${ecolor};font-weight:500;font-size:11px">${a.eol}</td><td style="text-align:center">${a.cves > 0 ? `<span class="badge ${a.cves >= 4 ? 'badge-danger' : 'badge-warn'}">${a.cves}</span>` : `<span style="color:var(--color-text-tertiary)">—</span>`}</td><td style="font-size:11px;white-space:nowrap">${a.zone}</td><td><span class="tag" style="${a.manual ? 'background:#FAEEDA;color:#633806' : ''}">${a.manual ? 'Manual' : 'Imported'}</span></td></tr>`;
+}
+
+function filterTable(q) {
+  document.querySelectorAll('#inv-body tr').forEach(r => { r.style.display = q === '' || r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none'; });
+}
+
+function purdueHTML() {
+  const levels = [
+    { num:'4', label:'Enterprise Zone', desc:'Business network, ERP, IT systems', cls:'zone-l4', assets: ASSETS.filter(a => a.level === 4), addable: false, importable: true },
+    { num:'3.5', label:'DMZ / Conduit', desc:'Industrial DMZ, Eagle40 firewalls, jump servers', cls:'zone-l35', assets: ASSETS.filter(a => a.level === 35), addable: false, importable: true },
+    { num:'3', label:'Supervisory Zone', desc:'SCADA, Historians, KEPServerEX OPC servers', cls:'zone-l35', assets: ASSETS.filter(a => a.level === 3), addable: false, importable: true },
+    { num:'2', label:'Control Zone', desc:'HMIs (PanelView, FactoryTalk View), Hirschmann switches, Studio 5000 EWS', cls:'zone-l2', assets: ASSETS.filter(a => a.level === 2), addable: false, importable: true },
+    { num:'1', label:'Field Devices', desc:'PLCs (ControlLogix, CompactLogix, S7-1500, S7-1200) — manual entry', cls:'zone-l1', assets: ASSETS.filter(a => a.level === 1), addable: true, importable: false },
+    { num:'0', label:'Process Level', desc:'Sensors, actuators, transmitters — manual entry required', cls:'zone-l0', assets: ASSETS.filter(a => a.level === 0), addable: true, importable: false },
+  ];
+  return `<div style="margin-bottom:12px;font-size:12px;color:var(--color-text-secondary)"><i class="ti ti-info-circle" style="font-size:14px;vertical-align:-2px"></i> Levels 0–1 require manual entry. Levels 2–4 support scan import.</div>${levels.map(l => `<div class="card" style="margin-bottom:10px"><div class="card-header"><div style="display:flex;align-items:center;gap:8px"><span class="purdue-zone ${l.cls}" style="margin:0;padding:3px 8px"><span class="zone-label">L${l.num}</span></span><div><div style="font-size:13px;font-weight:500">${l.label}</div><div style="font-size:11px;color:var(--color-text-secondary)">${l.desc}</div></div></div><div style="display:flex;gap:6px">${l.importable ? `<button class="btn" style="font-size:12px;padding:4px 10px" onclick="showView('import')"><i class="ti ti-upload"></i> Import</button>` : ''}${l.addable ? `<button class="btn btn-primary" style="font-size:12px;padding:4px 10px" onclick="sendPrompt('Add a new asset at Purdue L${l.num}')"><i class="ti ti-plus"></i> Add Asset</button>` : ''}</div></div>${l.assets.length > 0 ? `<table class="asset-table"><thead><tr><th>Status</th><th>Name</th><th>Type</th><th>Vendor / Model</th><th>IP</th><th>MAC</th><th>Firmware</th><th>EOL</th><th>CVEs</th></tr></thead><tbody>${l.assets.map(a => { const dot = a.status === 'online' ? 'dot-online' : 'dot-warn'; const [ec] = eolColor(a.eol); const fwOk = a.fw === a.fw_latest || a.fw === 'N/A'; return `<tr><td><span class="status-dot ${dot}"></span>${a.status}</td><td style="font-weight:500">${a.name}</td><td><span class="tag">${a.type}</span></td><td style="font-size:11px">${a.vendor} ${a.model}</td><td style="font-family:var(--font-mono);font-size:11px">${a.ip}</td><td style="font-family:var(--font-mono);font-size:10px">${a.mac}</td><td><span class="fw-badge ${fwOk ? 'fw-ok' : 'fw-old'}">${a.fw}</span></td><td style="color:${ec};font-weight:500;font-size:11px">${a.eol}</td><td>${a.cves > 0 ? `<span class="badge badge-warn">${a.cves}</span>` : '—'}</td></tr>`;}).join('')}</tbody></table>` : `<div style="color:var(--color-text-tertiary);font-size:12px;padding:8px 0">No assets at this level. ${l.addable ? 'Use "Add Asset" to register.' : 'Use "Import" to onboard.'}</div>`}</div>`).join('')}`;
+}
+
+function firmwareHTML() {
+  const outdated = ASSETS.filter(a => a.fw !== a.fw_latest && a.fw !== 'N/A');
+  const current = ASSETS.filter(a => a.fw === a.fw_latest || a.fw === 'N/A');
+  return `<div class="metrics-grid" style="grid-template-columns:repeat(3,1fr)"><div class="metric-card"><div class="metric-label">Up to Date</div><div class="metric-val" style="color:#639922">${current.length}</div></div><div class="metric-card"><div class="metric-label">Outdated</div><div class="metric-val" style="color:#EF9F27">${outdated.length}</div></div><div class="metric-card"><div class="metric-label">Update Coverage</div><div class="metric-val">${Math.round(current.length/ASSETS.length*100)}%</div></div></div><div class="card"><div class="card-header"><span class="card-title">Firmware Status — All Devices</span></div><table class="asset-table"><thead><tr><th>Asset</th><th>Type</th><th>Level</th><th>Vendor</th><th>Current Version</th><th>Latest Available</th><th>Status</th><th>Action</th></tr></thead><tbody>${ASSETS.filter(a => a.fw !== 'N/A').map(a => { const ok = a.fw === a.fw_latest; return `<tr><td style="font-weight:500">${a.name}</td><td><span class="tag">${a.type}</span></td><td>L${a.level===35?'3.5':a.level}</td><td>${a.vendor}</td><td style="font-family:var(--font-mono);font-size:11px">${a.fw}</td><td style="font-family:var(--font-mono);font-size:11px;color:${ok?'var(--color-text-tertiary)':'#185FA5'}">${a.fw_latest}</td><td><span class="fw-badge ${ok?'fw-ok':'fw-old'}">${ok?'Current':'Update Available'}</span></td><td>${!ok ? `<button class="btn" style="font-size:11px;padding:2px 8px" onclick="sendPrompt('Plan firmware update for ${a.name}')">Plan update ↗</button>` : '<span style="color:var(--color-text-tertiary);font-size:11px">—</span>'}</td></tr>`;}).join('')}</tbody></table></div>`;
+}
+
+function eolHTML() {
+  const sorted = [...ASSETS].sort((a,b) => new Date(a.eol+'-01') - new Date(b.eol+'-01'));
+  return `<div class="metrics-grid" style="grid-template-columns:repeat(4,1fr)"><div class="metric-card"><div class="metric-label">Critical (&lt;6mo)</div><div class="metric-val" style="color:#E24B4A">${sorted.filter(a=>eolColor(a.eol)[0]==='#E24B4A').length}</div></div><div class="metric-card"><div class="metric-label">Warning (&lt;18mo)</div><div class="metric-val" style="color:#EF9F27">${sorted.filter(a=>eolColor(a.eol)[0]==='#EF9F27').length}</div></div><div class="metric-card"><div class="metric-label">Healthy</div><div class="metric-val" style="color:#639922">${sorted.filter(a=>eolColor(a.eol)[0]==='#639922').length}</div></div><div class="metric-card"><div class="metric-label">Avg Remaining</div><div class="metric-val">3.4y</div></div></div><div class="card"><div class="card-header"><span class="card-title">EOL Tracker</span><span style="font-size:11px;color:var(--color-text-tertiary)">Sorted by soonest EOL</span></div><table class="asset-table"><thead><tr><th>Asset</th><th>Type</th><th>Vendor / Model</th><th>OS / Platform</th><th>EOL Date</th><th>Time Remaining</th><th>Risk</th><th>Action</th></tr></thead><tbody>${sorted.map(a => { const [col, sev] = eolColor(a.eol); const d = new Date(a.eol+'-01'), now = new Date(); const months = Math.round((d - now) / (1000*60*60*24*30)); const rem = months < 0 ? 'Expired' : months < 12 ? `${months}mo` : `${(months/12).toFixed(1)}yr`; return `<tr><td style="font-weight:500">${a.name}</td><td><span class="tag">${a.type}</span></td><td style="font-size:11px">${a.vendor} ${a.model}</td><td style="font-size:11px;color:var(--color-text-secondary)">${a.os}</td><td style="font-weight:500;color:${col}">${a.eol}</td><td style="font-size:11px;color:${col}">${rem}</td><td><span class="badge ${sev==='danger'?'badge-danger':sev==='warn'?'badge-warn':'badge-success'}">${sev==='danger'?'Critical':sev==='warn'?'Caution':'OK'}</span></td><td>${sev !== 'ok' ? `<button class="btn" style="font-size:11px;padding:2px 8px" onclick="sendPrompt('Plan EOL migration for ${a.name}')">Plan migration ↗</button>` : '—'}</td></tr>`;}).join('')}</tbody></table></div>`;
+}
+
+function alertsHTML() {
+  return `<div class="card"><div class="card-header"><span class="card-title">All Alerts</span><div style="display:flex;gap:5px"><span class="chip sel" onclick="filterAlerts('all',this)">All</span><span class="chip" onclick="filterAlerts('danger',this)">Critical</span><span class="chip" onclick="filterAlerts('warn',this)">Warning</span><span class="chip" onclick="filterAlerts('info',this)">Info</span></div></div><div id="alert-list">${ALERTS.map(a => `<div class="alert-item" data-sev="${a.sev}"><div class="alert-icon ai-${a.sev}"><i class="${a.icon}" style="font-size:13px"></i></div><div style="flex:1"><div style="font-weight:500;font-size:13px">${a.title}</div><div style="color:var(--color-text-secondary);font-size:12px;margin-top:2px">${a.detail}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span style="font-size:10px;color:var(--color-text-tertiary)">${a.time}</span><span class="badge badge-${a.sev==='danger'?'danger':a.sev==='warn'?'warn':'info'}">${a.sev}</span></div></div>`).join('')}</div></div>`;
+}
+
+function importHTML() {
+  return `<div class="two-col"><div><div class="card" style="margin-bottom:12px"><div class="card-header"><span class="card-title"><i class="ti ti-radar" style="font-size:15px;margin-right:6px;color:#378ADD"></i>Scan Import (L2–L4)</span></div><div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px">Supported for Control, Supervisory, DMZ, and Enterprise zones. Upload scan exports to auto-populate asset records.</div><div class="import-zone" onclick="sendPrompt('Browse for scan file')"><i class="ti ti-file-upload"></i><div style="font-weight:500;margin-bottom:4px">Drop scan file here or click to browse</div><div style="font-size:11px">Supports: Nmap XML · Tenable .nessus · CSV · Claroty export · Dragos export</div></div><div class="chip-group"><span class="chip sel">Nmap XML</span><span class="chip">Tenable .nessus</span><span class="chip">Claroty</span><span class="chip">Dragos</span><span class="chip">Generic CSV</span><span class="chip">XLSX</span></div></div><div class="card"><div class="card-header"><span class="card-title"><i class="ti ti-database-import" style="font-size:15px;margin-right:6px;color:#378ADD"></i>CSV / XLSX Template Import</span></div><div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px">Download the asset template, fill in data, and re-upload for bulk import of any level.</div><button class="btn" style="margin-right:6px" onclick="sendPrompt('Download CSV template')"><i class="ti ti-download"></i> Download Template ↗</button><button class="btn btn-primary"><i class="ti ti-upload"></i> Upload Completed Template</button></div></div><div><div class="card" style="margin-bottom:12px"><div class="card-header"><span class="card-title"><i class="ti ti-pencil" style="font-size:15px;margin-right:6px;color:#EF9F27"></i>Manual Entry (L0–L1 Required)</span></div><div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:12px">Field devices and process equipment at Levels 0–1 cannot be scanned safely. Enter assets manually.</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${['Asset Name','Vendor','Model / Part No.','Firmware Version','IP Address','MAC Address','Serial Number','Purdue Level','Installation Date','EOL Date','Zone / Area','Location'].map(f => `<div><div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px">${f}</div><input placeholder="${f}" style="width:100%;font-size:12px;padding:5px 8px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans)" /></div>`).join('')}</div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn btn-primary" onclick="alert('Asset saved! (demo)')"><i class="ti ti-check"></i> Save Asset</button><button class="btn" onclick="sendPrompt('Show field guidance')">Field guidance ↗</button></div></div><div class="card"><div class="card-header"><span class="card-title">Recent Imports</span></div>${[{src:'Nmap XML',date:'2026-05-19',count:14,zone:'L2–L3'},{src:'Manual entry',date:'2026-05-17',count:3,zone:'L0–L1'},{src:'Claroty export',date:'2026-05-10',count:22,zone:'L2–L4'}].map(r => `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px"><div><div style="font-weight:500">${r.src}</div><div style="font-size:11px;color:var(--color-text-secondary)">${r.zone} · ${r.date}</div></div><span class="badge badge-info">${r.count} assets</span></div>`).join('')}</div></div></div>`;
+}
+
+function vulnHTML() {
+  const allCVEs = ASSETS.filter(a => a.cves > 0).sort((a,b) => b.cves - a.cves);
+  return `<div class="metrics-grid" style="grid-template-columns:repeat(4,1fr)"><div class="metric-card"><div class="metric-label">Total CVEs</div><div class="metric-val" style="color:#E24B4A">${ASSETS.reduce((s,a)=>s+a.cves,0)}</div></div><div class="metric-card"><div class="metric-label">Affected Assets</div><div class="metric-val">${allCVEs.length}</div></div><div class="metric-card"><div class="metric-label">Critical (&ge;4 CVEs)</div><div class="metric-val" style="color:#E24B4A">${allCVEs.filter(a=>a.cves>=4).length}</div></div><div class="metric-card"><div class="metric-label">Clean Assets</div><div class="metric-val" style="color:#639922">${ASSETS.filter(a=>a.cves===0).length}</div></div></div><div class="card"><div class="card-header"><span class="card-title">Vulnerability Exposure</span></div><table class="asset-table"><thead><tr><th>Asset</th><th>Type</th><th>Level</th><th>Vendor</th><th>OS / Platform</th><th>Open CVEs</th><th>Firmware</th><th>EOL</th><th>Action</th></tr></thead><tbody>${allCVEs.map(a => { const [ec] = eolColor(a.eol); return `<tr><td style="font-weight:500">${a.name}</td><td><span class="tag">${a.type}</span></td><td>L${a.level===35?'3.5':a.level}</td><td>${a.vendor}</td><td style="font-size:11px;color:var(--color-text-secondary)">${a.os}</td><td><span class="badge ${a.cves>=4?'badge-danger':'badge-warn'}">${a.cves} CVEs</span></td><td><span class="fw-badge ${a.fw===a.fw_latest||a.fw==='N/A'?'fw-ok':'fw-old'}">${a.fw}</span></td><td style="color:${ec};font-size:11px;font-weight:500">${a.eol}</td><td><button class="btn" style="font-size:11px;padding:2px 8px" onclick="sendPrompt('Generate POA&M for ${a.name}')">POA&M ↗</button></td></tr>`;}).join('')}</tbody></table></div>`;
+}
+
+function filterAlerts(sev, el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  document.querySelectorAll('#alert-list .alert-item').forEach(row => { row.style.display = sev === 'all' || row.dataset.sev === sev ? '' : 'none'; });
+}
+
+showView('dashboard');
+</script>
+</body>
+</html>
