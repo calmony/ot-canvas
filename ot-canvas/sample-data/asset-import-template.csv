@@ -1,0 +1,7 @@
+asset_name,vendor,model,type,purdue_level,ip_address,mac_address,firmware_version,firmware_latest,os_platform,eol_date,serial_number,zone,location,installation_date,notes
+PLC-CLX-EXAMPLE-99,Rockwell,ControlLogix 1756-L83E,PLC,1,10.10.1.99,00:1D:9C:4A:1B:99,v34.014,v34.014,Logix Firmware,2029-03,SN-EXAMPLE-001,Field (L1),Building A / Cell 3,2023-04-15,Example PLC entry
+PLC-S7-EXAMPLE-99,Siemens,SIMATIC S7-1500 CPU 1516-3 PN/DP,PLC,1,10.10.2.99,00:1B:1B:81:0A:99,V3.1.4,V3.1.4,Siemens FW,2032-01,SN-EXAMPLE-002,Field (L1),Building A / Cell 5,2024-01-20,Example Siemens PLC
+HMI-PVP-EXAMPLE-99,Rockwell,PanelView Plus 7 1500P,HMI,2,192.168.2.99,00:1D:9C:5B:2C:99,v14.00.05,v14.00.05,Win CE,2028-03,SN-EXAMPLE-003,Control (L2),Control Room A,2023-07-10,Example HMI
+SW-HM-EXAMPLE-99,Hirschmann,RSP35 Industrial Backbone,Switch,2,192.168.2.99,EC:74:BA:01:01:99,HiOS 09.4.02,HiOS 09.4.02,HiOS,2030-12,SN-EXAMPLE-004,Control (L2),IDF-1,2024-03-05,Example switch
+FW-EAGLE40-EXAMPLE-99,Hirschmann (Belden),EAGLE40-03 Industrial Firewall,Firewall,3.5,10.100.0.99,EC:74:BA:02:02:99,HiSecOS 04.1.02,HiSecOS 04.1.02,HiSecOS,2031-06,SN-EXAMPLE-005,DMZ (L3.5),DMZ rack,2024-06-12,Example firewall
+OPC-KEP-EXAMPLE-99,Kepware (PTC),KEPServerEX v6.16,OPC Server,3,192.168.3.99,00:50:56:8A:3C:99,v6.16.339.0,v6.16.339.0,Win Server 2022,2028-09,SN-EXAMPLE-006,Supervisory (L3),Server room,2024-09-01,Example OPC server
